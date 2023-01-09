@@ -16,7 +16,7 @@ EXPLORING_RATE_DECAY = 0.995
 EXPLORING_RATE_MIN = 0.1
 GAMMA = 0.95
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def get_learning_rate(epoch):
   # if epoch % 10 != 0:
