@@ -10,11 +10,11 @@ import time
 
 EPISODE_SIZE = 400
 EPISODE_LENGTH = 200
-LEARNING_RATE = 0.99
+LEARNING_RATE = 0.9
 EXPLORING_RATE = 0.95
-EXPLORING_RATE_DECAY = 0.99
+EXPLORING_RATE_DECAY = 0.995
 EXPLORING_RATE_MIN = 0.01
-GAMMA = 0.999
+GAMMA = 0.99
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
