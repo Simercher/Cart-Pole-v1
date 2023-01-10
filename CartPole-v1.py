@@ -8,21 +8,21 @@ import matplotlib.pyplot as plt
 import math
 import time
 
-EPISODE_SIZE = 200
+EPISODE_SIZE = 400
 EPISODE_LENGTH = 200
-LEARNING_RATE = 1e-2
-EXPLORING_RATE = 0.9
-EXPLORING_RATE_DECAY = 0.995
-EXPLORING_RATE_MIN = 0.1
-GAMMA = 0.95
+LEARNING_RATE = 0.99
+EXPLORING_RATE = 0.95
+EXPLORING_RATE_DECAY = 0.99
+EXPLORING_RATE_MIN = 0.01
+GAMMA = 0.999
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def get_learning_rate(epoch):
   # if epoch % 10 != 0:
   #   return max(LEARNING_RATE * pow(0.1, epoch - 1), 1e-4) 
-  # return max(LEARNING_RATE * pow(0.1, epoch / 10), 1e-4)
-  return max(0.01, min(0.5, 1.0 - math.log10((epoch+1)/25)))
+  return max(LEARNING_RATE * pow(0.95, epoch), 1e-2)
+#   return max(0.01, min(0.5, 1.0 - math.log10((epoch+1)/25)))
 
 def get_state(observation, state_bounds, observation_num):
   state = [0] * len(observation)
@@ -87,9 +87,10 @@ def main():
   all_lr = []
 
   for i in range(EPISODE_SIZE):
-    # exploring_rate = max(EXPLORING_RATE * pow(EXPLORING_RATE_DECAY, i), EXPLORING_RATE_MIN)
-    exploring_rate = max(0.01, min(1, 1.0 - math.log10((i+1)/25)))
-    learning_rate = max(0.01, min(0.5, 1.0 - math.log10((i+1)/25)))
+    exploring_rate = max(EXPLORING_RATE * pow(EXPLORING_RATE_DECAY, i), EXPLORING_RATE_MIN)
+    # exploring_rate = max(0.01, min(1, 1.0 - math.log10((i+1)/25)))
+    # learning_rate = max(0.01, min(0.5, 1.0 - math.log10((i+1)/25)))
+    learning_rate = get_learning_rate(i)
     all_lr.append(exploring_rate)
 
     observation = env.reset()
@@ -105,13 +106,15 @@ def main():
       q_next_max = np.amax(q_table[next_state])
       q_table[state + (action,)] += learning_rate * (reward + GAMMA * q_next_max - q_table[state + (action,)])
 
+      state = next_state
+
       if done:
         # print('Episode finished after {} timesteps, total rewards {}'.format(step+1, each_reward))
         break
     all_rewards.append(each_reward)
 
   plot_rewards(all_rewards, EPISODE_SIZE, 'Q-table')
-  plot_lr(all_lr, EPISODE_SIZE, 'Q-table')
+  # plot_lr(all_lr, EPISODE_SIZE, 'Q-table')
   env.close()
 
 if __name__ == '__main__':
